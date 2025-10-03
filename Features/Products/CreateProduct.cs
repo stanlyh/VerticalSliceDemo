@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using VerticalSliceDemo.ContextDB;
+using System.ComponentModel;
 
 namespace VerticalSliceDemo.Features.Products
 {

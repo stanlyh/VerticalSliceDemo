@@ -4,3 +4,8 @@ GET {{VerticalSliceDemo_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{VerticalSliceDemo_HostAddress}}/api/product/getAll
+Accept: application/json
+
+###
