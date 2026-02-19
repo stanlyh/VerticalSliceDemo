@@ -1,10 +1,10 @@
 ## Ejemplo de Vertical Slice en .NET
 
-Proyecto de demostración que implementa la arquitectura **Vertical Slice** en una API REST con **.NET 9**. Cada funcionalidad (feature) está autocontenida en un solo archivo, agrupando comando/query, handler y controller.
+Proyecto de demostración que implementa la arquitectura **Vertical Slice** en una API REST con **.NET 10**. Cada funcionalidad (feature) está autocontenida en un solo archivo, agrupando comando/query, handler y controller.
 
 ### Tecnologías
 
-- **.NET 9** / C#
+- **.NET 10** / C#
 - **ASP.NET Core Web API**
 - **Microsoft.Data.SqlClient** (ADO.NET) para acceso a SQL Server
 - **OpenAPI** para documentación de endpoints
