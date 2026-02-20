@@ -16,13 +16,21 @@ VerticalSliceDemo/
 ├── ContextDB/
 │   └── ConnectionDB.cs          # Wrapper de conexión a SQL Server
 ├── Features/
-│   └── Products/
-│       ├── CreateProduct.cs     # POST   /api/product/new
-│       ├── GetAllProduct.cs     # GET    /api/product/getAll
-│       ├── EditProduct.cs       # PUT    /api/product/edit
-│       └── DeleteProduct.cs     # DELETE /api/product/delete
-├── Controllers/
-│   └── WeatherForecastController.cs
+│   ├── Products/
+│   │   ├── CreateProduct.cs     # POST   /api/product/new
+│   │   ├── GetAllProduct.cs     # GET    /api/product/getAll
+│   │   ├── EditProduct.cs       # PUT    /api/product/edit
+│   │   └── DeleteProduct.cs     # DELETE /api/product/delete
+│   ├── Clients/
+│   │   ├── CreateClient.cs      # POST   /api/client/new
+│   │   ├── GetAllClient.cs      # GET    /api/client/getAll
+│   │   ├── EditClient.cs        # PUT    /api/client/edit
+│   │   └── DeleteClient.cs      # DELETE /api/client/delete
+│   └── Providers/
+│       ├── CreateProvider.cs    # POST   /api/provider/new
+│       ├── GetAllProvider.cs    # GET    /api/provider/getAll
+│       ├── EditProvider.cs      # PUT    /api/provider/edit
+│       └── DeleteProvider.cs    # DELETE /api/provider/delete
 ├── Program.cs
 ├── appsettings.json
 └── VerticalSliceDemo.csproj
@@ -30,7 +38,7 @@ VerticalSliceDemo/
 
 ### Arquitectura Vertical Slice
 
-Cada archivo dentro de `Features/Products/` contiene todo lo necesario para una operación:
+Cada archivo dentro de `Features/` contiene todo lo necesario para una operación:
 
 ```
 CreateProduct.cs
@@ -43,12 +51,32 @@ Esto permite trabajar en una funcionalidad sin afectar las demás, facilitando e
 
 ### Endpoints
 
-| Método   | Ruta                    | Descripción              |
-|----------|-------------------------|--------------------------|
-| `POST`   | `/api/product/new`      | Crear un producto        |
+#### Products
+
+| Método   | Ruta                    | Descripción               |
+|----------|-------------------------|---------------------------|
+| `POST`   | `/api/product/new`      | Crear un producto         |
 | `GET`    | `/api/product/getAll`   | Listar todos los productos |
-| `PUT`    | `/api/product/edit`     | Editar un producto       |
-| `DELETE` | `/api/product/delete`   | Eliminar un producto     |
+| `PUT`    | `/api/product/edit`     | Editar un producto        |
+| `DELETE` | `/api/product/delete`   | Eliminar un producto      |
+
+#### Clients
+
+| Método   | Ruta                   | Descripción              |
+|----------|------------------------|--------------------------|
+| `POST`   | `/api/client/new`      | Crear un cliente         |
+| `GET`    | `/api/client/getAll`   | Listar todos los clientes |
+| `PUT`    | `/api/client/edit`     | Editar un cliente        |
+| `DELETE` | `/api/client/delete`   | Eliminar un cliente      |
+
+#### Providers
+
+| Método   | Ruta                     | Descripción                |
+|----------|--------------------------|----------------------------|
+| `POST`   | `/api/provider/new`      | Crear un proveedor         |
+| `GET`    | `/api/provider/getAll`   | Listar todos los proveedores |
+| `PUT`    | `/api/provider/edit`     | Editar un proveedor        |
+| `DELETE` | `/api/provider/delete`   | Eliminar un proveedor      |
 
 ### Configuración
 
