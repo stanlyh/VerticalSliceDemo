@@ -66,6 +66,84 @@ VerticalSliceDemo/
 
 ---
 
+### Diagrama de capas
+
+```mermaid
+graph TB
+    subgraph BROWSER["🌐 Navegador — Angular 21"]
+        direction TB
+        subgraph LAYOUT["Layout Shell"]
+            SB[Sidebar]
+            RO[Router Outlet]
+            TS[Toast global]
+        end
+
+        subgraph SLICES_FE["Feature Slices (lazy chunks)"]
+            direction LR
+            subgraph PS["Products"]
+                PL[products-list]
+                PF[product-form]
+                PST[products.state\nsignal / computed]
+            end
+            subgraph CS["Clients"]
+                CL[clients-list]
+                CF[client-form]
+                CST[clients.state\nsignal / computed]
+            end
+            subgraph PRS["Providers"]
+                PRL[providers-list]
+                PRF[provider-form]
+                PRST[providers.state\nsignal / computed]
+            end
+        end
+
+        subgraph SHARED["Shared Components"]
+            DT[data-table]
+            MD[modal]
+            CD[confirm-dialog]
+            FF[form-field]
+            SK[table-skeleton]
+        end
+
+        subgraph CORE_FE["Core"]
+            BU[base-url\ninterceptor]
+            EH[error-handler\ninterceptor]
+            TSV[toast.service]
+        end
+    end
+
+    subgraph API["⚙️ Backend — .NET 10 ASP.NET Core"]
+        direction TB
+        subgraph SLICES_BE["Feature Slices"]
+            direction LR
+            subgraph PROD["Products"]
+                PC[Controller] --> PH[Handler] --> PDB[(SQL)]
+            end
+            subgraph CLIE["Clients"]
+                CC[Controller] --> CH[Handler] --> CDB[(SQL)]
+            end
+            subgraph PROV["Providers"]
+                PRC[Controller] --> PRH[Handler] --> PRDB[(SQL)]
+            end
+        end
+        CORS[CORS Middleware]
+    end
+
+    subgraph DB["🗄️ SQL Server"]
+        MINIO[(MININODB)]
+    end
+
+    RO --> SLICES_FE
+    PST -->|HTTP via\nHttpClient| CORE_FE
+    CST -->|HTTP via\nHttpClient| CORE_FE
+    PRST -->|HTTP via\nHttpClient| CORE_FE
+    CORE_FE -->|REST JSON\nlocalhost:5170| CORS
+    CORS --> SLICES_BE
+    PDB & CDB & PRDB --> MINIO
+```
+
+---
+
 ### Arquitectura Vertical Slice
 
 El patrón se aplica en ambas capas. Cada feature es autocontenida de extremo a extremo.
