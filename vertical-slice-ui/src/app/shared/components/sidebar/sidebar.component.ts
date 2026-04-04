@@ -5,18 +5,25 @@ interface NavItem {
   label: string;
   route: string;
   icon: string;
+  color: string;
+  colorDark: string;
+  badge: string;
 }
 
 @Component({
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <aside class="w-64 bg-gray-900 text-white flex flex-col h-full shrink-0">
+    <aside style="width:16rem;min-width:16rem;height:100%;display:flex;flex-direction:column;
+                  background:#030b1a;border-right:1px solid rgba(255,255,255,0.06);color:white">
 
-      <!-- Logo / Brand -->
-      <div class="flex items-center gap-3 px-6 py-5 border-b border-gray-700">
-        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <!-- Brand -->
+      <div style="display:flex;align-items:center;gap:0.75rem;padding:1.5rem;
+                  border-bottom:1px solid rgba(255,255,255,0.06)">
+        <div style="width:2.25rem;height:2.25rem;border-radius:0.75rem;display:flex;
+                    align-items:center;justify-content:center;flex-shrink:0;
+                    background:linear-gradient(135deg,#3b82f6,#6366f1)">
+          <svg style="width:1.25rem;height:1.25rem;color:white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
               d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z
                  M14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z
@@ -25,32 +32,63 @@ interface NavItem {
           </svg>
         </div>
         <div>
-          <p class="text-sm font-bold text-white leading-tight">Vertical Slice</p>
-          <p class="text-xs text-gray-400">Demo App</p>
+          <p style="font-size:0.875rem;font-weight:700;color:white;line-height:1.2">Vertical Slice</p>
+          <p style="font-size:0.75rem;color:#475569">Demo App</p>
         </div>
       </div>
 
-      <!-- Nav links -->
-      <nav class="flex-1 px-3 py-4 space-y-1">
-        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 mb-3">
-          Módulos
-        </p>
-        @for (item of navItems(); track item.route) {
+      <!-- Nav -->
+      <nav style="flex:1;padding:1.25rem 1rem;display:flex;flex-direction:column;gap:0.25rem;overflow-y:auto">
+        <p style="font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;
+                  padding:0 0.75rem;margin-bottom:0.75rem;color:#334155">Módulos</p>
+
+        @for (item of navItems(); track item.route; let i = $index) {
           <a
             [routerLink]="item.route"
-            routerLinkActive="bg-blue-600 text-white"
+            routerLinkActive
+            #rla="routerLinkActive"
             [routerLinkActiveOptions]="{ exact: false }"
-            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
-                   text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-150">
-            <span class="w-5 h-5 shrink-0" [innerHTML]="item.icon"></span>
-            {{ item.label }}
+            style="display:flex;align-items:center;gap:0.75rem;padding:0.625rem 0.75rem;
+                   border-radius:0.75rem;font-size:0.875rem;font-weight:500;
+                   transition:background 0.15s,border 0.15s;text-decoration:none;position:relative"
+            [style.background]="rla.isActive ? item.color + '18' : 'transparent'"
+            [style.border]="rla.isActive ? '1px solid ' + item.color + '44' : '1px solid transparent'">
+
+            <!-- Number badge -->
+            <span style="width:1.5rem;height:1.5rem;border-radius:50%;display:flex;align-items:center;
+                         justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0"
+                  [style.background]="item.color + '22'"
+                  [style.color]="item.color">
+              {{ i + 1 }}
+            </span>
+
+            <!-- Icon -->
+            <span class="nav-icon" style="width:1rem;height:1rem;flex-shrink:0;transition:color 0.15s"
+                  [style.color]="rla.isActive ? item.color : '#64748b'"
+                  [innerHTML]="item.icon"></span>
+
+            <!-- Label -->
+            <span style="transition:color 0.15s"
+                  [style.color]="rla.isActive ? item.color : '#94a3b8'">
+              {{ item.label }}
+            </span>
+
+            <!-- Badge -->
+            @if (rla.isActive) {
+              <span style="margin-left:auto;font-size:0.65rem;font-weight:700;text-transform:uppercase;
+                           padding:0.125rem 0.375rem;border-radius:0.25rem"
+                    [style.color]="item.color"
+                    [style.background]="item.color + '22'">
+                {{ item.badge }}
+              </span>
+            }
           </a>
         }
       </nav>
 
       <!-- Footer -->
-      <div class="px-6 py-4 border-t border-gray-700">
-        <p class="text-xs text-gray-500">.NET 10 + Angular 21</p>
+      <div style="padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,0.06)">
+        <p style="font-size:0.75rem;color:#334155">.NET 10 + Angular 21</p>
       </div>
     </aside>
   `
@@ -60,6 +98,9 @@ export class SidebarComponent {
     {
       label: 'Productos',
       route: '/products',
+      badge: 'CRUD',
+      color: '#f97316',
+      colorDark: '#ea580c',
       icon: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
@@ -68,6 +109,9 @@ export class SidebarComponent {
     {
       label: 'Clientes',
       route: '/clients',
+      badge: 'CRUD',
+      color: '#06d6a0',
+      colorDark: '#059669',
       icon: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857
@@ -78,6 +122,9 @@ export class SidebarComponent {
     {
       label: 'Proveedores',
       route: '/providers',
+      badge: 'CRUD',
+      color: '#a855f7',
+      colorDark: '#7c3aed',
       icon: `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5

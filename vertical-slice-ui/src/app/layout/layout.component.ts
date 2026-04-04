@@ -7,14 +7,14 @@ import { ToastComponent } from '../shared/components/toast/toast.component';
   selector: 'app-layout',
   imports: [RouterOutlet, SidebarComponent, ToastComponent],
   template: `
-    <div class="flex h-screen bg-gray-100 overflow-hidden">
+    <div style="display:flex;height:100vh;overflow:hidden;background:#060d1f">
 
       <!-- Sidebar -->
       <app-sidebar />
 
       <!-- Main content -->
-      <main class="flex-1 overflow-y-auto">
-        <div class="p-6 max-w-7xl mx-auto">
+      <main style="flex:1;overflow-y:auto">
+        <div style="padding:2rem;max-width:80rem;margin:0 auto">
           <router-outlet />
         </div>
       </main>

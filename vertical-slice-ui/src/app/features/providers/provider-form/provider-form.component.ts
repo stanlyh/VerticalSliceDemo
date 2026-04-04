@@ -4,50 +4,43 @@ import { ProvidersState } from '../providers.state';
 import { FormFieldComponent } from '../../../shared/components/form-field/form-field.component';
 import { phoneFormat } from '../../../shared/validators/custom-validators';
 
+const INPUT_STYLE = `width:100%;padding:0.5rem 0.75rem;border-radius:0.5rem;font-size:0.875rem;
+  background:#0a1128;color:#e2e8f0;border:1px solid rgba(255,255,255,0.12);
+  outline:none;transition:border-color 0.15s;box-sizing:border-box`;
+
 @Component({
   selector: 'app-provider-form',
   imports: [ReactiveFormsModule, FormFieldComponent],
   template: `
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" style="display:flex;flex-direction:column;gap:1rem">
 
-      <!-- Name -->
       <app-form-field label="Nombre" [control]="form.get('name')" [required]="true">
-        <input
-          formControlName="name"
-          type="text"
-          placeholder="Ej: Distribuidora Norte S.A."
-          class="w-full px-3 py-2 border rounded-lg text-sm transition-colors
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          [class.border-red-500]="form.get('name')?.invalid && form.get('name')?.touched"
-          [class.border-gray-300]="!(form.get('name')?.invalid && form.get('name')?.touched)" />
+        <input formControlName="name" type="text" placeholder="Ej: Distribuidora Norte S.A." [style]="inputStyle"
+          onfocus="this.style.borderColor='rgba(168,85,247,0.5)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.12)'" />
       </app-form-field>
 
-      <!-- Phone -->
       <app-form-field label="Teléfono" [control]="form.get('phone')" [required]="true">
-        <input
-          formControlName="phone"
-          type="tel"
-          placeholder="Ej: +54 9 11 1234-5678"
-          class="w-full px-3 py-2 border rounded-lg text-sm transition-colors
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          [class.border-red-500]="form.get('phone')?.invalid && form.get('phone')?.touched"
-          [class.border-gray-300]="!(form.get('phone')?.invalid && form.get('phone')?.touched)" />
+        <input formControlName="phone" type="tel" placeholder="Ej: +54 9 11 1234-5678" [style]="inputStyle"
+          onfocus="this.style.borderColor='rgba(168,85,247,0.5)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.12)'" />
       </app-form-field>
 
-      <!-- Actions -->
-      <div class="flex gap-3 justify-end pt-2">
-        <button
-          type="button"
-          (click)="onCancel()"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300
-                 rounded-lg hover:bg-gray-50 transition-colors">
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;padding-top:0.5rem">
+        <button type="button" (click)="onCancel()"
+          style="padding:0.5rem 1rem;font-size:0.875rem;font-weight:500;border-radius:0.5rem;
+                 cursor:pointer;color:#94a3b8;background:rgba(255,255,255,0.04);
+                 border:1px solid rgba(255,255,255,0.08);transition:background 0.15s"
+          onmouseenter="this.style.background='rgba(255,255,255,0.08)'"
+          onmouseleave="this.style.background='rgba(255,255,255,0.04)'">
           Cancelar
         </button>
-        <button
-          type="submit"
-          [disabled]="form.invalid || state.loading()"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg
-                 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        <button type="submit" [disabled]="form.invalid || state.loading()"
+          style="padding:0.5rem 1rem;font-size:0.875rem;font-weight:600;border-radius:0.5rem;
+                 cursor:pointer;background:rgba(168,85,247,0.15);color:#a855f7;
+                 border:1px solid rgba(168,85,247,0.3);transition:background 0.15s"
+          onmouseenter="this.style.background='rgba(168,85,247,0.25)'"
+          onmouseleave="this.style.background='rgba(168,85,247,0.15)'">
           {{ state.selected() ? 'Guardar cambios' : 'Crear proveedor' }}
         </button>
       </div>
@@ -55,8 +48,9 @@ import { phoneFormat } from '../../../shared/validators/custom-validators';
   `
 })
 export class ProviderFormComponent {
-  readonly state = inject(ProvidersState);
-  private fb     = inject(FormBuilder);
+  readonly state      = inject(ProvidersState);
+  readonly inputStyle = INPUT_STYLE;
+  private fb          = inject(FormBuilder);
 
   form = this.fb.group({
     name:  ['', [Validators.required, Validators.minLength(2)]],
@@ -65,33 +59,19 @@ export class ProviderFormComponent {
 
   constructor() {
     effect(() => {
-      const selected = this.state.selected();
-      if (selected) {
-        this.form.patchValue({ name: selected.name, phone: selected.phone });
-      } else {
-        this.form.reset();
-      }
+      const s = this.state.selected();
+      if (s) this.form.patchValue({ name: s.name, phone: s.phone });
+      else this.form.reset();
     });
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     const { name, phone } = this.form.value;
-    const selected = this.state.selected();
-
-    if (selected) {
-      this.state.edit({ idProvider: selected.idProvider, name: name!, phone: phone! });
-    } else {
-      this.state.create({ name: name!, phone: phone! });
-    }
+    const s = this.state.selected();
+    if (s) this.state.edit({ idProvider: s.idProvider, name: name!, phone: phone! });
+    else this.state.create({ name: name!, phone: phone! });
   }
 
-  onCancel(): void {
-    this.state.clearSelected();
-    this.form.reset();
-  }
+  onCancel(): void { this.state.clearSelected(); this.form.reset(); }
 }

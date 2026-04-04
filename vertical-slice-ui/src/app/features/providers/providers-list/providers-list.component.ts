@@ -8,63 +8,58 @@ import { ModalComponent } from '../../../shared/components/modal/modal.component
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 import { ProviderFormComponent } from '../provider-form/provider-form.component';
 
+const ACCENT = '#a855f7';
+
 @Component({
   selector: 'app-providers-list',
   imports: [
-    PageHeaderComponent,
-    TableSkeletonComponent,
-    DataTableComponent,
-    ModalComponent,
-    ConfirmDialogComponent,
-    ProviderFormComponent
+    PageHeaderComponent, TableSkeletonComponent, DataTableComponent,
+    ModalComponent, ConfirmDialogComponent, ProviderFormComponent
   ],
   template: `
-    <!-- Header -->
-    <app-page-header title="Proveedores" subtitle="Gestión del directorio de proveedores">
-      <button
-        actions
-        (click)="openCreate()"
-        class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm
-               font-medium rounded-lg hover:bg-blue-700 active:scale-95 transition-all duration-150">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <app-page-header title="Proveedores" subtitle="Gestión del directorio de proveedores" [accent]="accent">
+      <button actions (click)="openCreate()"
+        style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;
+               font-size:0.875rem;font-weight:600;border-radius:0.75rem;cursor:pointer;
+               transition:background 0.15s;background:rgba(168,85,247,0.12);
+               color:#a855f7;border:1px solid rgba(168,85,247,0.3)"
+        onmouseenter="this.style.background='rgba(168,85,247,0.22)'"
+        onmouseleave="this.style.background='rgba(168,85,247,0.12)'">
+        <svg style="width:1rem;height:1rem;flex-shrink:0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
         </svg>
         Nuevo proveedor
       </button>
     </app-page-header>
 
-    <!-- Skeleton -->
-    <app-table-skeleton
-      [visible]="state.loading()"
-      [cols]="['4rem', '14rem', '10rem']" />
+    <app-table-skeleton [visible]="state.loading()" [cols]="['4rem', '14rem', '10rem']" />
 
-    <!-- Table -->
     @if (!state.loading()) {
-      <app-data-table
-        [columns]="columns"
-        [data]="state.items()"
-        (edit)="onEdit($event)"
-        (delete)="onDeleteRequest($event)" />
+      <app-data-table [columns]="columns" [data]="state.items()"
+        (edit)="onEdit($event)" (delete)="onDeleteRequest($event)" />
     }
 
-    <!-- Create / Edit Modal -->
-    <app-modal
-      [open]="modalOpen()"
-      [title]="state.selected() ? 'Editar proveedor' : 'Nuevo proveedor'"
+    @if (!state.loading() && state.items().length > 0) {
+      <div style="margin-top:1rem;display:flex;align-items:center;gap:0.5rem">
+        <span style="font-size:0.7rem;font-weight:700;text-transform:uppercase;
+                     padding:0.125rem 0.5rem;border-radius:0.375rem;
+                     color:#a855f7;background:rgba(168,85,247,0.1)">PÚRPURA</span>
+        <span style="font-size:0.75rem;color:#334155">{{ state.items().length }} registro(s)</span>
+      </div>
+    }
+
+    <app-modal [open]="modalOpen()" [title]="state.selected() ? 'Editar proveedor' : 'Nuevo proveedor'"
       (closed)="closeModal()">
       <app-provider-form />
     </app-modal>
 
-    <!-- Confirm Delete Dialog -->
-    <app-confirm-dialog
-      [open]="confirmOpen()"
-      [itemName]="pendingDelete()?.name ?? ''"
-      (confirmed)="onDeleteConfirm()"
-      (cancelled)="confirmOpen.set(false)" />
+    <app-confirm-dialog [open]="confirmOpen()" [itemName]="pendingDelete()?.name ?? ''"
+      (confirmed)="onDeleteConfirm()" (cancelled)="confirmOpen.set(false)" />
   `
 })
 export class ProvidersListComponent implements OnInit {
-  readonly state = inject(ProvidersState);
+  readonly state  = inject(ProvidersState);
+  readonly accent = ACCENT;
 
   modalOpen     = signal(false);
   confirmOpen   = signal(false);
@@ -76,30 +71,11 @@ export class ProvidersListComponent implements OnInit {
     { key: 'phone',      label: 'Teléfono' }
   ];
 
-  ngOnInit(): void {
-    this.state.loadAll();
-  }
-
-  openCreate(): void {
-    this.state.clearSelected();
-    this.modalOpen.set(true);
-  }
-
-  onEdit(provider: Provider): void {
-    this.state.selectForEdit(provider);
-    this.modalOpen.set(true);
-  }
-
-  closeModal(): void {
-    this.modalOpen.set(false);
-    this.state.clearSelected();
-  }
-
-  onDeleteRequest(provider: Provider): void {
-    this.pendingDelete.set(provider);
-    this.confirmOpen.set(true);
-  }
-
+  ngOnInit(): void { this.state.loadAll(); }
+  openCreate(): void { this.state.clearSelected(); this.modalOpen.set(true); }
+  onEdit(p: Provider): void { this.state.selectForEdit(p); this.modalOpen.set(true); }
+  closeModal(): void { this.modalOpen.set(false); this.state.clearSelected(); }
+  onDeleteRequest(p: Provider): void { this.pendingDelete.set(p); this.confirmOpen.set(true); }
   onDeleteConfirm(): void {
     const id = this.pendingDelete()?.idProvider;
     if (id !== undefined) this.state.remove(id);

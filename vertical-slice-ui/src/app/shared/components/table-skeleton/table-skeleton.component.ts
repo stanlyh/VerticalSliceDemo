@@ -4,27 +4,33 @@ import { Component, input } from '@angular/core';
   selector: 'app-table-skeleton',
   template: `
     @if (visible()) {
-      <div class="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+      <div style="border-radius:1rem;overflow:hidden;border:1px solid rgba(255,255,255,0.06)">
         <!-- Header -->
-        <div class="bg-gray-50 px-6 py-3 flex gap-6 border-b border-gray-200">
+        <div style="background:#0a1128;padding:0.75rem 1.5rem;display:flex;gap:1.5rem;
+                    border-bottom:1px solid rgba(255,255,255,0.06)">
           @for (col of cols(); track $index) {
-            <div class="h-3 bg-gray-200 rounded animate-pulse"
+            <div style="height:0.75rem;border-radius:0.25rem;background:#1e3a5f;animation:pulse 2s infinite"
                  [style.width]="col"></div>
           }
-          <div class="h-3 bg-gray-200 rounded animate-pulse w-16 ml-auto"></div>
+          <div style="height:0.75rem;border-radius:0.25rem;background:#1e3a5f;
+                      animation:pulse 2s infinite;width:4rem;margin-left:auto"></div>
         </div>
         <!-- Rows -->
-        <div class="bg-white divide-y divide-gray-100">
+        <div style="background:#0d1635">
           @for (row of rows(); track $index) {
-            <div class="px-6 py-4 flex gap-6 items-center">
+            <div style="padding:1rem 1.5rem;display:flex;gap:1.5rem;align-items:center;
+                        border-bottom:1px solid rgba(255,255,255,0.04)">
               @for (col of cols(); track $index) {
-                <div class="h-3.5 bg-gray-100 rounded animate-pulse"
+                <div style="height:0.875rem;border-radius:0.25rem;background:#111d42;
+                            animation:pulse 2s infinite"
                      [style.width]="col"
                      [style.animation-delay]="($index * 80) + 'ms'"></div>
               }
-              <div class="flex gap-2 ml-auto">
-                <div class="w-7 h-7 bg-gray-100 rounded-md animate-pulse"></div>
-                <div class="w-7 h-7 bg-gray-100 rounded-md animate-pulse"></div>
+              <div style="display:flex;gap:0.5rem;margin-left:auto">
+                <div style="width:1.75rem;height:1.75rem;border-radius:0.375rem;
+                            background:#111d42;animation:pulse 2s infinite"></div>
+                <div style="width:1.75rem;height:1.75rem;border-radius:0.375rem;
+                            background:#111d42;animation:pulse 2s infinite"></div>
               </div>
             </div>
           }

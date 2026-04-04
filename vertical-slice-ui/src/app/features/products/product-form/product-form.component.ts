@@ -4,51 +4,43 @@ import { ProductsState } from '../products.state';
 import { FormFieldComponent } from '../../../shared/components/form-field/form-field.component';
 import { positiveNumber } from '../../../shared/validators/custom-validators';
 
+const INPUT_STYLE = `width:100%;padding:0.5rem 0.75rem;border-radius:0.5rem;font-size:0.875rem;
+  background:#0a1128;color:#e2e8f0;border:1px solid rgba(255,255,255,0.12);
+  outline:none;transition:border-color 0.15s;box-sizing:border-box`;
+
 @Component({
   selector: 'app-product-form',
   imports: [ReactiveFormsModule, FormFieldComponent],
   template: `
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" style="display:flex;flex-direction:column;gap:1rem">
 
-      <!-- Name -->
       <app-form-field label="Nombre" [control]="form.get('name')" [required]="true">
-        <input
-          formControlName="name"
-          type="text"
-          placeholder="Ej: Laptop Dell XPS"
-          class="w-full px-3 py-2 border rounded-lg text-sm transition-colors
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          [class.border-red-500]="form.get('name')?.invalid && form.get('name')?.touched"
-          [class.border-gray-300]="!(form.get('name')?.invalid && form.get('name')?.touched)" />
+        <input formControlName="name" type="text" placeholder="Ej: Laptop Dell XPS" [style]="inputStyle"
+          onfocus="this.style.borderColor='rgba(249,115,22,0.5)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.12)'" />
       </app-form-field>
 
-      <!-- Price -->
       <app-form-field label="Precio" [control]="form.get('price')" [required]="true">
-        <input
-          formControlName="price"
-          type="number"
-          placeholder="0"
-          min="1"
-          class="w-full px-3 py-2 border rounded-lg text-sm transition-colors
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          [class.border-red-500]="form.get('price')?.invalid && form.get('price')?.touched"
-          [class.border-gray-300]="!(form.get('price')?.invalid && form.get('price')?.touched)" />
+        <input formControlName="price" type="number" placeholder="0" min="1" [style]="inputStyle"
+          onfocus="this.style.borderColor='rgba(249,115,22,0.5)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.12)'" />
       </app-form-field>
 
-      <!-- Actions -->
-      <div class="flex gap-3 justify-end pt-2">
-        <button
-          type="button"
-          (click)="onCancel()"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300
-                 rounded-lg hover:bg-gray-50 transition-colors">
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;padding-top:0.5rem">
+        <button type="button" (click)="onCancel()"
+          style="padding:0.5rem 1rem;font-size:0.875rem;font-weight:500;border-radius:0.5rem;
+                 cursor:pointer;color:#94a3b8;background:rgba(255,255,255,0.04);
+                 border:1px solid rgba(255,255,255,0.08);transition:background 0.15s"
+          onmouseenter="this.style.background='rgba(255,255,255,0.08)'"
+          onmouseleave="this.style.background='rgba(255,255,255,0.04)'">
           Cancelar
         </button>
-        <button
-          type="submit"
-          [disabled]="form.invalid || state.loading()"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg
-                 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        <button type="submit" [disabled]="form.invalid || state.loading()"
+          style="padding:0.5rem 1rem;font-size:0.875rem;font-weight:600;border-radius:0.5rem;
+                 cursor:pointer;background:rgba(249,115,22,0.15);color:#f97316;
+                 border:1px solid rgba(249,115,22,0.3);transition:background 0.15s"
+          onmouseenter="this.style.background='rgba(249,115,22,0.25)'"
+          onmouseleave="this.style.background='rgba(249,115,22,0.15)'">
           {{ state.selected() ? 'Guardar cambios' : 'Crear producto' }}
         </button>
       </div>
@@ -56,8 +48,9 @@ import { positiveNumber } from '../../../shared/validators/custom-validators';
   `
 })
 export class ProductFormComponent {
-  readonly state = inject(ProductsState);
-  private fb     = inject(FormBuilder);
+  readonly state      = inject(ProductsState);
+  readonly inputStyle = INPUT_STYLE;
+  private fb          = inject(FormBuilder);
 
   form = this.fb.group({
     name:  ['', [Validators.required, Validators.minLength(2)]],
@@ -65,35 +58,20 @@ export class ProductFormComponent {
   });
 
   constructor() {
-    // Patch form when an item is selected for editing
     effect(() => {
-      const selected = this.state.selected();
-      if (selected) {
-        this.form.patchValue({ name: selected.name, price: selected.price });
-      } else {
-        this.form.reset();
-      }
+      const s = this.state.selected();
+      if (s) this.form.patchValue({ name: s.name, price: s.price });
+      else this.form.reset();
     });
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     const { name, price } = this.form.value;
-    const selected = this.state.selected();
-
-    if (selected) {
-      this.state.edit({ idProduct: selected.idProduct, name: name!, price: price! });
-    } else {
-      this.state.create({ name: name!, price: price! });
-    }
+    const s = this.state.selected();
+    if (s) this.state.edit({ idProduct: s.idProduct, name: name!, price: price! });
+    else this.state.create({ name: name!, price: price! });
   }
 
-  onCancel(): void {
-    this.state.clearSelected();
-    this.form.reset();
-  }
+  onCancel(): void { this.state.clearSelected(); this.form.reset(); }
 }

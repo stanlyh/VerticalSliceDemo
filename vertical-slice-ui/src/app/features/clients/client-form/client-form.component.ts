@@ -3,50 +3,43 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ClientsState } from '../clients.state';
 import { FormFieldComponent } from '../../../shared/components/form-field/form-field.component';
 
+const INPUT_STYLE = `width:100%;padding:0.5rem 0.75rem;border-radius:0.5rem;font-size:0.875rem;
+  background:#0a1128;color:#e2e8f0;border:1px solid rgba(255,255,255,0.12);
+  outline:none;transition:border-color 0.15s;box-sizing:border-box`;
+
 @Component({
   selector: 'app-client-form',
   imports: [ReactiveFormsModule, FormFieldComponent],
   template: `
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" style="display:flex;flex-direction:column;gap:1rem">
 
-      <!-- Name -->
       <app-form-field label="Nombre" [control]="form.get('name')" [required]="true">
-        <input
-          formControlName="name"
-          type="text"
-          placeholder="Ej: Juan García"
-          class="w-full px-3 py-2 border rounded-lg text-sm transition-colors
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          [class.border-red-500]="form.get('name')?.invalid && form.get('name')?.touched"
-          [class.border-gray-300]="!(form.get('name')?.invalid && form.get('name')?.touched)" />
+        <input formControlName="name" type="text" placeholder="Ej: Juan García" [style]="inputStyle"
+          onfocus="this.style.borderColor='rgba(6,214,160,0.5)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.12)'" />
       </app-form-field>
 
-      <!-- Email -->
       <app-form-field label="Correo electrónico" [control]="form.get('email')" [required]="true">
-        <input
-          formControlName="email"
-          type="email"
-          placeholder="Ej: juan@empresa.com"
-          class="w-full px-3 py-2 border rounded-lg text-sm transition-colors
-                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          [class.border-red-500]="form.get('email')?.invalid && form.get('email')?.touched"
-          [class.border-gray-300]="!(form.get('email')?.invalid && form.get('email')?.touched)" />
+        <input formControlName="email" type="email" placeholder="Ej: juan@empresa.com" [style]="inputStyle"
+          onfocus="this.style.borderColor='rgba(6,214,160,0.5)'"
+          onblur="this.style.borderColor='rgba(255,255,255,0.12)'" />
       </app-form-field>
 
-      <!-- Actions -->
-      <div class="flex gap-3 justify-end pt-2">
-        <button
-          type="button"
-          (click)="onCancel()"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300
-                 rounded-lg hover:bg-gray-50 transition-colors">
+      <div style="display:flex;gap:0.75rem;justify-content:flex-end;padding-top:0.5rem">
+        <button type="button" (click)="onCancel()"
+          style="padding:0.5rem 1rem;font-size:0.875rem;font-weight:500;border-radius:0.5rem;
+                 cursor:pointer;color:#94a3b8;background:rgba(255,255,255,0.04);
+                 border:1px solid rgba(255,255,255,0.08);transition:background 0.15s"
+          onmouseenter="this.style.background='rgba(255,255,255,0.08)'"
+          onmouseleave="this.style.background='rgba(255,255,255,0.04)'">
           Cancelar
         </button>
-        <button
-          type="submit"
-          [disabled]="form.invalid || state.loading()"
-          class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg
-                 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+        <button type="submit" [disabled]="form.invalid || state.loading()"
+          style="padding:0.5rem 1rem;font-size:0.875rem;font-weight:600;border-radius:0.5rem;
+                 cursor:pointer;background:rgba(6,214,160,0.15);color:#06d6a0;
+                 border:1px solid rgba(6,214,160,0.3);transition:background 0.15s"
+          onmouseenter="this.style.background='rgba(6,214,160,0.25)'"
+          onmouseleave="this.style.background='rgba(6,214,160,0.15)'">
           {{ state.selected() ? 'Guardar cambios' : 'Crear cliente' }}
         </button>
       </div>
@@ -54,8 +47,9 @@ import { FormFieldComponent } from '../../../shared/components/form-field/form-f
   `
 })
 export class ClientFormComponent {
-  readonly state = inject(ClientsState);
-  private fb     = inject(FormBuilder);
+  readonly state  = inject(ClientsState);
+  readonly inputStyle = INPUT_STYLE;
+  private fb      = inject(FormBuilder);
 
   form = this.fb.group({
     name:  ['', [Validators.required, Validators.minLength(2)]],
@@ -64,33 +58,19 @@ export class ClientFormComponent {
 
   constructor() {
     effect(() => {
-      const selected = this.state.selected();
-      if (selected) {
-        this.form.patchValue({ name: selected.name, email: selected.email });
-      } else {
-        this.form.reset();
-      }
+      const s = this.state.selected();
+      if (s) this.form.patchValue({ name: s.name, email: s.email });
+      else this.form.reset();
     });
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     const { name, email } = this.form.value;
-    const selected = this.state.selected();
-
-    if (selected) {
-      this.state.edit({ idClient: selected.idClient, name: name!, email: email! });
-    } else {
-      this.state.create({ name: name!, email: email! });
-    }
+    const s = this.state.selected();
+    if (s) this.state.edit({ idClient: s.idClient, name: name!, email: email! });
+    else this.state.create({ name: name!, email: email! });
   }
 
-  onCancel(): void {
-    this.state.clearSelected();
-    this.form.reset();
-  }
+  onCancel(): void { this.state.clearSelected(); this.form.reset(); }
 }
